@@ -45,7 +45,7 @@ if(is_plugin_active('pretty-link/pretty-link.php')) {
       }
 
       public function options() {
-        if(!is_admin()) { wp_die(__('Whoa pardner ... you don\'t have access to that')); }
+        if(!is_admin() or !current_user_can('manage_options')) { wp_die(__('Whoa pardner ... you don\'t have access to that')); }
 
         $method = strtolower($_SERVER['REQUEST_METHOD']);
 
