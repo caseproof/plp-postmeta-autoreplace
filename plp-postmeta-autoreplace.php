@@ -33,7 +33,7 @@ if(is_plugin_active('pretty-link/pretty-link.php')) {
     class PlpPmAutoreplace {
       public function __construct() {
         add_action('admin_menu', array($this,'menu'));
-        add_filter('get_post_metadata', array($this,'autoreplace'));
+        add_filter('get_post_metadata', array($this,'autoreplace'), 10, 4);
       }
 
       public function menu() {
@@ -58,6 +58,9 @@ if(is_plugin_active('pretty-link/pretty-link.php')) {
       public function autoreplace( $check, $object_id, $meta_key, $single ) {
         global $wpdb, $prli_link, $prli_blogurl;
 
+        // We don't want to return the pretty link if we're in the admin
+        if( is_admin() ) { return $check; }
+
         $autoreplace = get_option('plp_pm_autoreplace');
         $postmetas = array_map('trim',explode(',',$autoreplace));
 
@@ -78,12 +81,9 @@ if(is_plugin_active('pretty-link/pretty-link.php')) {
             $pls[$i] = "{$prli_blogurl}{$struct}{$pl->slug}";
         }
 
-        if(empty($pls))
-          return $check;
-        else if($single)
-          return $pls[0];
-        else
-          return $pls; 
+        if(empty($pls)) { return $check; }
+        else if($single) { return $pls[0]; }
+        else { return $pls; }
       }
 
       private function display($message = '') {
