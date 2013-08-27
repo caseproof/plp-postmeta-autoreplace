@@ -67,23 +67,34 @@ if(is_plugin_active('pretty-link/pretty-link.php')) {
         if( !in_array( $meta_key, $postmetas ) ) { return $check; }
 
         if( $single )
-          $urls = $wpdb->get_col( $wpdb->prepare('SELECT meta_value FROM ' . $wpdb->postmeta . ' WHERE meta_key=%s and post_id=%d', $meta_key, $object_id) );
+          $metavals = $wpdb->get_col( $wpdb->prepare('SELECT meta_value FROM ' . $wpdb->postmeta . ' WHERE meta_key=%s and post_id=%d', $meta_key, $object_id) );
         else
-          $urls = $wpdb->get_col( $wpdb->prepare('SELECT meta_value FROM ' . $wpdb->postmeta . ' WHERE meta_key=%s and post_id=%d ORDER BY meta_id DESC LIMIT 1', $meta_key, $object_id) );
+          $metavals = $wpdb->get_col( $wpdb->prepare('SELECT meta_value FROM ' . $wpdb->postmeta . ' WHERE meta_key=%s and post_id=%d ORDER BY meta_id DESC LIMIT 1', $meta_key, $object_id) );
 
-        if(empty($urls)) { return $check; }
+        if(empty($metavals)) { return $check; }
 
+        $nmv = array();
         $struct = PrliUtils::get_permalink_pre_slug_uri();
-        $pls = array();
 
-        for( $i = 0; $i < count($urls); $i++ ) {
-          if($pl = $prli_link->get_or_create_pretty_link_for_target_url( $urls[$i] ))
-            $pls[$i] = "{$prli_blogurl}{$struct}{$pl->slug}";
+        for( $i = 0; $i < count($metavals); $i++ ) {
+          preg_match_all('!(https?://[0-9a-zA-Z/\[\]\?\&=\.-_~%]+)!i', $metavals[$i], $matches);
+      
+          $prli_lookup = $prli_link->get_target_to_pretty_urls( $matches[1], true );
+
+          if($prli_lookup !== false and is_array($prli_lookup)) {
+            $url_patterns = array_map( create_function( '$target_url',
+                                                        'return "#" . preg_quote($target_url, "#") . "#";' ),
+                                       array_keys( $prli_lookup ) );
+            $url_replacements = array_values( array_map( create_function( '$pretty_urls',
+                                                                          'return $pretty_urls[0];' ),
+                                                         $prli_lookup ) );
+
+            $nmv[$i] = preg_replace( $url_patterns, $url_replacements, $metavals[$i] );
+          }
         }
 
-        if(empty($pls)) { return $check; }
-        else if($single) { return $pls[0]; }
-        else { return $pls; }
+        if($single) { return $nmv[0]; }
+        else { return $nmv; }
       }
 
       private function display($message = '') {
