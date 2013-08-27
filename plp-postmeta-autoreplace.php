@@ -3,7 +3,7 @@
 Plugin Name: Pretty Link Post-Meta Autoreplace
 Plugin URI: http://github.com/Caseproof/plp-postmeta-autoreplace
 Description: Ties Pretty Link Pro's autoreplace capability into post meta fields that are specified in the admin
-Version: 1.0.0
+Version: 1.0.1
 Author: Caseproof
 Author URI: http://caseproof.com
 Text Domain: plp-postmeta-autoreplace
