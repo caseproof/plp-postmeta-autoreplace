@@ -19,9 +19,9 @@ on:
 
 env:
   PROJECT_ORG: caseproof
-  PRIMARY_CODEOWNER: "@sethshoultes"
-  PROJECT_ID: 9
-  ISSUE_MANAGE_PAT: ${{ secrets.PT_ISSUE_MANAGE_PAT }}
+  PRIMARY_CODEOWNER: "@cartpauj"
+  PROJECT_ID: 8
+  ISSUE_MANAGE_PAT: ${{ secrets.MP_ISSUE_MANAGE_PAT_1 }}
 
 jobs:
 
